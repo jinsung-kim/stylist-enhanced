@@ -1,4 +1,4 @@
-from ClothingItem import ClothingItem
+from models.Models import ClothingItem
 
 class Node:
 

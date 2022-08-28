@@ -15,7 +15,7 @@ class Fit(enum.Enum):
     regular = 1
     oversized = 2
 
-class Type(enum.Enum):
+class Category(enum.Enum):
 
     undefined = -1
     hat = 0
@@ -40,9 +40,9 @@ class Brand:
         :param collab: whether an item is a collaboration piece or not
         :param collaborators: if the prior parameter is set to true, this is where the collaborators live
         '''
-        self.brand = brand
-        self.collab = collab
-        self.collaborators = collaborators
+        self.brand: str = brand
+        self.collab: bool = collab
+        self.collaborators: list[str] = collaborators
 
     def __eq__(self, other: Brand):
         if (self.brand != other.brand):
@@ -55,10 +55,10 @@ class Brand:
 class Color:
 
     def __init__(self, primary: str, faded: bool = False):
-        self.primary = primary
+        self.primary: str = primary
         # Faded colors should be treated like a slightly different color
         # i.e. black faded t-shirt
-        self.faded = faded
+        self.faded: bool = faded
 
     def __str__(self):
         return "Color: {}".format(self.primary)
@@ -71,3 +71,26 @@ class Color:
 
     def convert_to_hex(self) -> str:
         pass
+
+class ClothingItem:
+
+    def __init__(self, item_name: str, brand: Brand, colors: list[Color], 
+                size: Fit, category: Category, trip_mission: list[Mission]):
+        '''
+        :param item_name: name of item, relatively descriptive, brand not needed
+        :param brand: name of the brand
+        :param prim, sec: Color type
+        :param size: how the article of clothing fits
+        :param category: what sort of item this is
+        :param trip_mission: how this item is typically worn
+        '''
+        self.item_name = item_name
+        self.brand = brand
+        self.primary = colors[0]
+        if (len(colors) > 1):
+            self.secondary = colors[1]
+        else:
+            self.secondary = None
+        self.size = size
+        self.category = category
+        self.trip_mission = trip_mission
