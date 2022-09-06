@@ -49,6 +49,7 @@ class Brand:
             return False
         if (self.collab != other.collab):
             return False
+        # The reason collection is used is because the content matters, order does not
         return collections.Counter(self.collaborators) == collections.Counter(other.collaborators)
         
 
@@ -70,12 +71,15 @@ class Color:
         pass
 
     def convert_to_hex(self) -> str:
+        '''
+        TODO: Write this out in a way that is scalable
+        '''
         pass
 
 class ClothingItem:
 
     def __init__(self, item_name: str, brand: Brand, colors: list[Color], 
-                size: Fit, category: Category, trip_mission: list[Mission]):
+                 size: Fit, category: Category, trip_mission: list[Mission], favorite: bool):
         '''
         :param item_name: name of item, relatively descriptive, brand not needed
         :param brand: name of the brand
@@ -83,6 +87,7 @@ class ClothingItem:
         :param size: how the article of clothing fits
         :param category: what sort of item this is
         :param trip_mission: how this item is typically worn
+        :param favorite: is this item commonly worn?
         '''
         self.item_name = item_name
         self.brand = brand
@@ -94,3 +99,7 @@ class ClothingItem:
         self.size = size
         self.category = category
         self.trip_mission = trip_mission
+        self.is_favorite = favorite
+
+    def __str__(self):
+        return "{} {} in {}".format(self.brand, self.item_name, self.primary)

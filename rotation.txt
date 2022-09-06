@@ -1,0 +1,53 @@
+HATS
+Beanie, Stussy/Nike, Black/None, Undefined, *
+Yankees Cap, Vintage, Navy/White, Undefined, *
+Fuji Bandana, Kapital, Navy/White, Undefined, *
+
+TOPS
+Logo Top, AFFXWRKS, LightBlue/Black, Slim, *
+Logo Top, AFFXWRKS, Black/Red, Regular
+On Site Focus Top, AFFXWRKS, Brown/None, Slim
+Third Space Top, AFFXWRKS, Black/None, Slim
+Logo Top, Stussy, Black/White, Oversized, *
+Logo Top, Stussy, White/Black, Oversized
+Logo Top, Saturdays NYC, Black/Grey, Regular
+Logo Top, Saturdays NYC, White/Peach, Regular
+Fish Top, Vintage, Black-Faded/White, Oversized, *
+Logo Top, Vintage, Black/Grey, Oversized
+Blank Top, Vintage, White/None, Regular
+Turtleneck, Uniqlo, Black/None, Regular
+
+OUTERWEAR
+Knitted Sweatshirt, Oree NYC, Tan/Brown, Oversized, *
+Denim Jacket, Helmut Lang, Grey/None, Slim
+Blue Fish Sweatshirt, Vintage, Blue/White, Regular, *
+Zip Up Fleece Jacket, Reese Cooper, Green/Black, Regular, *
+Oversized Hoodie, YEEZY/GAP, Black/None, Oversized
+Lava Logo Hoodie, Helmut Lang, Red/Black, Oversized
+Taxi Logo Hoodie, Helmut Lang, White/Red, Slim
+Workwear Jacket, Dickies, Black/None, Oversized
+Detroit Jacket, Carhartt, Brown/Black, Regular
+Blank Hoodie, Vintage, Grey/None, Regular
+Mohair Knit, Vintage, Grey/None, Slim
+Nylon Coat, Prada, Black/None, Regular
+
+BOTTOMS
+517 Corduroys, Levis, Brown/None, Regular, *
+517 Corduroys, Levis, Black/None, Slim
+517 Denim Orange Tab, Levis, LightBlue/White, Slim, *
+517 Denim Orange Tab, Levis, Blue/White, Slim
+505 Denim, Levis, Blue/None, Regular
+Double Knee, Dickies, Black/None, Oversized, *
+Carpenter Pants, Carhartt, Green/None, Regular
+Flared Pant, Andersson Bell, Black/None, Regular, *
+
+SHOES
+Duck Boot, Diemme, Brown/None, Oversized
+Air Force, Nike, White/None, Regular
+1460 Mid Top Boot, Doc Martens, Black/None, Regular, *
+Jordan 1, Nike, Grey/Black, Regular, *
+Mura Vibram, Suicoke, Black/None, Regular
+Fur Boot, Suicoke, Brown/None, Slim
+Samba, Adidas, White/Tan, Slim, *
+990v5 Runners, New Balance, Grey/White, Oversized
+Hiking Boot, Vintage, Brown/Black, Regular, *
