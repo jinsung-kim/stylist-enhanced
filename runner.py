@@ -1,9 +1,6 @@
 from __future__ import annotations
-from multiprocessing import parent_process
-from posixpath import split
 import sys
 import os
-from xml.dom.expatbuilder import parseString
 # import requests
 # from decouple import config
 
@@ -16,10 +13,15 @@ class Database:
     def __init__(self) -> None:
         # Each category organized
         self.items: dict[str, list[ClothingItem]] = {}
+        self.ruleset: dict[str, KeyValueStore] = {}
         self.curr = ""
 
     def _generate_brand(self, text: str) -> Brand:
-        pass
+        split_brands: list[str] = text.split("/")
+        main_brand: str = split_brands[0]
+        collab: bool = True if len(split_brands) > 1 else False
+        split_brands.pop(0)
+        return Brand(main_brand, collab, split_brands)
 
     def _generate_colors(self, text: str) -> list[Color]:
         split_str: list[str] = text.split("/")
@@ -57,13 +59,29 @@ class Database:
         else:
             return Fit.undefined
 
+    def _returnType(self, text: str) -> list[any]:
+        line_split: list[str] = text.split("->")
+        value: int = int(text.split("=")[1].strip())
+        one: any = None
+        two: any = None
+        if self.curr == "FIT":
+            one = self._categorize_sizing(line_split[0].strip())
+            two = self._categorize_sizing(line_split[1].split("=")[0].strip())
+        elif self.curr == "COLOR":
+            one = self._generate_colors(line_split[0].strip())
+            two = self._generate_colors(line_split[1].split("=")[0].strip())
+        # To add combo later
+        else:
+            pass
+        return [one, two, value]
+
     def load_clothing_from_txt(self, filename: str = "rotation.txt") -> bool:
         txt_file = open(filename, "r")
 
         lines = txt_file.readlines()
 
         target = ["HATS", "OUTERWEAR", "TOPS", "BOTTOMS", "SHOES"]
-        adding_clothing = True
+        adding_clothing = False
 
         # Add each item in its intended category
         for line in lines:
@@ -81,21 +99,35 @@ class Database:
                 brand: Brand = self._generate_brand(attributes[1].strip())
                 colors: list[Color] = self._generate_colors(attributes[2].strip())
                 sizing: Fit = self._categorize_sizing(attributes[3].strip())
-                is_favorite: bool = len(attributes) == 5
+                is_favorite: bool = (len(attributes) == 5)
 
                 self.items[self.curr].append(ClothingItem(name, brand, colors, sizing, \
                                                           self._current_category(), [], is_favorite))
 
         txt_file.close()
 
-    def load_ruleset(self, filename: str = "rules.txt"):
+    def load_ruleset_from_txt(self, filename: str = "ruleset.txt"):
         txt_file = open(filename, "r")
 
         lines = txt_file.readlines()
+        target = ["FIT", "COLOR"]
+        adding = False
 
-        curr = ""
-
-        target = ["BRANDS", ""]
+        for line in lines:
+            line = line.strip("\n")
+            if line in target:
+                self.curr = line
+                self.ruleset[self.curr] = KeyValueStore(self.curr)
+                adding = True
+            elif len(line) == 0:
+                self.curr = ""
+                adding = False
+            elif len(line) > 0 and adding:
+                parsed: list[any] = self._returnType(line)
+                if self.curr == "COLOR":
+                    self.ruleset[self.curr].store(parsed[0][0], parsed[1][0], parsed[2])
+                else:
+                    self.ruleset[self.curr].store(parsed[0], parsed[1], parsed[2])
 
         txt_file.close()
 
@@ -103,3 +135,4 @@ if __name__ == "__main__":
     db: Database = Database()
 
     db.load_clothing_from_txt()
+    db.load_ruleset_from_txt()

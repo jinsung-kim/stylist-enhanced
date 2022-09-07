@@ -1,0 +1,58 @@
+BRANDS
+Stussy
+Stussy/Nike
+Dickies
+Vintage
+Oree NYC
+Prada
+Carhartt
+AFFXWRKS
+Levis
+Andersson Bell
+Fear of God Essentials
+Helmut Lang
+GAP, YEEZY
+Nike
+Doc Martens
+Diemme
+New Balance
+Suicoke
+Patagonia
+Saturdays NYC
+Reese Cooper
+Uniqlo
+Kapital
+
+FIT
+Oversized -> Slim = -1
+Regular -> Slim = 1
+Slim -> Oversized = 1
+Regular -> Regular = 1
+Regular -> Oversized = 1
+
+COLOR
+Red -> Blue = -1
+Green -> Red = -1
+Red -> Brown = -1
+LightBlue -> Blue = 1
+LightBlue -> Black = 1
+Blue -> Brown = 1
+Green -> Black = 1
+Green -> Brown = 1
+Brown -> Black = 1
+Brown -> Blue = 1
+Tan -> Brown = 1
+Tan -> Blue = 1
+Tan -> White = 1
+White -> Blue = 1
+White -> LightBlue = 1
+Grey -> Black = 1
+Grey -> LightBlue = 1
+Navy -> Black = 1
+Navy -> White = 1
+
+COMBOS
+517 -> Boot = 1
+Double -> Samba = 1
+Sweatshirt -> Double = 1
+Jacket -> Dickies = 1

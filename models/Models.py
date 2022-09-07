@@ -62,7 +62,7 @@ class Color:
         self.faded: bool = faded
 
     def __str__(self):
-        return "Color: {}".format(self.primary)
+        return "Color: {}{}".format(self.primary, "-faded" if self.faded else "")
 
     def __eq__(self, other: Color) -> bool:
         return (self.primary == other.primary) and (self.faded == other.faded)
