@@ -52,6 +52,15 @@ class Brand:
         # The reason collection is used is because the content matters, order does not
         return collections.Counter(self.collaborators) == collections.Counter(other.collaborators)
         
+    def __str__(self):
+        res: str = "{}".format(self.brand)
+        if self.collab:
+            for collab in self.collaborators:
+                res += " {}".format(collab)
+
+            return res
+        else:
+            return res
 
 class Color:
 
@@ -89,17 +98,17 @@ class ClothingItem:
         :param trip_mission: how this item is typically worn
         :param favorite: is this item commonly worn?
         '''
-        self.item_name = item_name
-        self.brand = brand
-        self.primary = colors[0]
+        self.item_name: str = item_name
+        self.brand: Brand = brand
+        self.primary: Color = colors[0]
         if (len(colors) > 1):
-            self.secondary = colors[1]
+            self.secondary: Color = colors[1]
         else:
-            self.secondary = None
-        self.size = size
-        self.category = category
-        self.trip_mission = trip_mission
-        self.is_favorite = favorite
+            self.secondary: Color = None
+        self.size: Fit = size
+        self.category: Category = category
+        self.trip_mission: list[Mission] = trip_mission
+        self.is_favorite: bool = favorite
 
     def __str__(self):
-        return "{} {} in {}".format(self.brand, self.item_name, self.primary)
+        return "{} {} in {}".format(self.brand.__str__(), self.item_name, self.primary)

@@ -1,19 +1,25 @@
 from __future__ import annotations
 import sys
 import os
+import copy
 # import requests
 # from decouple import config
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from models.KeyValueStore import KeyValueStore
+from models.Node import Node
 from models.Models import *
+
+CATEGORIES: list[str] = ["HATS", "OUTERWEAR", "TOPS", "BOTTOMS", "SHOES"]
 
 class Database:
     
     def __init__(self) -> None:
         # Each category organized
-        self.items: dict[str, list[ClothingItem]] = {}
+        self.items: dict[str, list[Node]] = {}
         self.ruleset: dict[str, KeyValueStore] = {}
+        self.seen_outfits: list[list[ClothingItem]] = []
+        self.nodes_start: list[Node] = []
         self.curr = ""
 
     def _generate_brand(self, text: str) -> Brand:
@@ -28,7 +34,7 @@ class Database:
         colors: list[Color] = []
 
         for color in split_str:
-            if "-" in color:
+            if "-" in color: # Faded color
                 colors.append(Color(color.split("-")[0], True))
             else:
                 colors.append(Color(color))
@@ -101,8 +107,10 @@ class Database:
                 sizing: Fit = self._categorize_sizing(attributes[3].strip())
                 is_favorite: bool = (len(attributes) == 5)
 
-                self.items[self.curr].append(ClothingItem(name, brand, colors, sizing, \
-                                                          self._current_category(), [], is_favorite))
+                self.items[self.curr].append(Node(ClothingItem(name, brand, colors, sizing, \
+                                                          self._current_category(), [], is_favorite)))
+
+        self._add_connections()
 
         txt_file.close()
 
@@ -131,8 +139,77 @@ class Database:
 
         txt_file.close()
 
+    def _add_connections(self):
+        for item in self.items[CATEGORIES[0]]:
+            item.add_adj(self.items[CATEGORIES[1]])
+            item.add_adj(self.items[CATEGORIES[2]])
+            self.nodes_start.append(item)
+
+        # Starting nodes from outerwear, tops
+        for i in range(1, 3):
+            for item in self.items[CATEGORIES[i]]:
+                self.nodes_start.append(item)
+
+        # Connect each category with the next until the shoes
+        for i in range(2, 4):
+            for item in self.items[CATEGORIES[i]]:
+                item.add_adj(self.items[CATEGORIES[i + 1]])
+
+    def _dfs(self, curr: Node, outfit: list[ClothingItem]):
+        outfit.append(curr.item)
+        if curr.item.category == Category.shoes: # Last item
+            if outfit not in self.seen_outfits:
+                self.seen_outfits.append(copy.deepcopy(outfit))
+        else:
+            for next_node in curr.children:
+                self._dfs(next_node, outfit)
+        outfit.pop()
+
+    def generate_outfits(self, top_k: int) -> list[list[ClothingItem]]:
+
+        for node in self.nodes_start:
+            self._dfs(node, [])
+
+        for i in range(0, 3400, 100):
+            print("new outfit:")
+            for item in self.seen_outfits[i]:
+                print(item)
+            print("")
+
+        scored: list[tuple[int, ClothingItem]] = []
+
+        scored.sort(key=lambda y: y[0])
+        scored.reverse()
+
+        res: list[list[ClothingItem]] = []
+
+        i: int = 0
+        n: int = 0
+
+        while (n < top_k):
+            fit: list[ClothingItem] = scored[i][1]
+            fit_tuple: tuple[ClothingItem] = tuple(fit)
+            if (fit not in res) and (fit_tuple not in self.seen_outfits):
+                res.append(fit)
+                n += 1
+            i += 1
+
+        return res
+
+    def _calculate_score(self, outfit: list[ClothingItem]) -> int:
+        final_score: int = 0
+
+        # Go through all rulesets
+
+        # Check weather
+
+
+
+        return final_score
+
 if __name__ == "__main__":
     db: Database = Database()
 
     db.load_clothing_from_txt()
     db.load_ruleset_from_txt()
+    db.generate_outfits(0)
