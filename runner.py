@@ -207,6 +207,8 @@ class Database:
         scored.sort(key=lambda y: y[0])
         scored.reverse()
 
+        self.save_to_file(scored)
+
         res: list[list[ClothingItem]] = []
 
         i: int = 0
@@ -286,11 +288,23 @@ class Database:
             print(
                 "The weather could not be retrieved. Please try again later.")
 
+    def print_outfit(self, outfit: list[ClothingItem]) -> str:
+        res: str = ""
+
+        for item in outfit:
+            res = res + item.__str__() + "\n"
+
+        return res
+
     def print_outfits(self, outfits: list[list[ClothingItem]]):
         for outfit in outfits:
-            for item in outfit:
-                print(item)
+            print(self.print_outfit(outfit))
             print()
+
+    def save_to_file(self, outfits: list[tuple[int, ClothingItem]], filename: str = "outfits.txt"):
+        with open(filename, 'w') as f:
+            for i in range(len(outfits)):
+                f.write("{}\nWith score: {}\n".format(self.print_outfit(outfits[i][1]), outfits[i][0]))
 
 if __name__ == "__main__":
     db: Database = Database()
