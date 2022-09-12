@@ -151,7 +151,7 @@ class Database:
                 self.nodes_start.append(item)
 
         # Connect each category with the next until the shoes
-        for i in range(2, 4):
+        for i in range(1, 4):
             for item in self.items[CATEGORIES[i]]:
                 item.add_adj(self.items[CATEGORIES[i + 1]])
 
@@ -165,18 +165,29 @@ class Database:
                 self._dfs(next_node, outfit)
         outfit.pop()
 
+    def _outfit_count(self) -> dict[int, int]:
+        res: dict[int, int] = {}
+
+        for outfit in self.seen_outfits:
+            if len(outfit) not in res:
+                res[len(outfit)] = 1
+            else:
+                res[len(outfit)] += 1
+        
+        return res
+
     def generate_outfits(self, top_k: int) -> list[list[ClothingItem]]:
 
         for node in self.nodes_start:
             self._dfs(node, [])
 
-        for i in range(0, 3400, 100):
-            print("new outfit:")
-            for item in self.seen_outfits[i]:
-                print(item)
-            print("")
-
         scored: list[tuple[int, ClothingItem]] = []
+
+        print(self._outfit_count())
+
+        # Evaluate scores
+        for fit in self.seen_outfits:
+            scored.append((self._calculate_score(fit), fit))
 
         scored.sort(key=lambda y: y[0])
         scored.reverse()
@@ -188,8 +199,7 @@ class Database:
 
         while (n < top_k):
             fit: list[ClothingItem] = scored[i][1]
-            fit_tuple: tuple[ClothingItem] = tuple(fit)
-            if (fit not in res) and (fit_tuple not in self.seen_outfits):
+            if (fit not in res):
                 res.append(fit)
                 n += 1
             i += 1
@@ -199,11 +209,48 @@ class Database:
     def _calculate_score(self, outfit: list[ClothingItem]) -> int:
         final_score: int = 0
 
-        # Go through all rulesets
+        # Go through fit ruleset to match top -> bottom
+        outerwear: int = -1
+        top: int = -1
+        bottom: int = -1
+        for i in range(len(outfit)):
+            # Outerwear overrides top -> because it layers over
+            if outfit[i].category == Category.top:
+                top = i
+            if outfit[i].category == Category.outerwear:
+                outerwear = i
+            if outfit[i].category == Category.pants:
+                bottom = i
 
-        # Check weather
+            # Favorite piece
+            if outfit[i].is_favorite:
+                final_score += 1
 
+        if outerwear == -1:
+            if self.ruleset["FIT"].exists(outfit[top].size, outfit[bottom].size):
+                final_score += self.ruleset["FIT"].find(outfit[top].size, outfit[bottom].size)
+        # Has outerwear
+        else:
+            if self.ruleset["FIT"].exists(outfit[outerwear].size, outfit[bottom].size):
+                final_score += self.ruleset["FIT"].find(outfit[top].size, outfit[bottom].size)
+            
+            # Also check to ensure that the top does not outdo the top in terms of length / size
+            if outfit[top].size.value > outfit[outerwear].size.value:
+                final_score -= 1
+            elif outfit[top].size == outfit[outerwear].size:
+                final_score += 1
 
+        # Go through color ruleset
+        for i in range(len(outfit) - 1):
+            if self.ruleset["COLOR"].exists(outfit[i].primary, outfit[i + 1].primary):
+                final_score += self.ruleset["COLOR"].find(outfit[i].primary, outfit[i + 1].primary)
+
+        # TODO: Check weather
+
+        if (final_score < 0):
+            print(outfit)
+            print(final_score)
+            print()
 
         return final_score
 

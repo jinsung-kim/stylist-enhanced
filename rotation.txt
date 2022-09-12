@@ -1,7 +1,7 @@
 HATS
-Beanie, Stussy/Nike, Black/None, Undefined, *
-Yankees Cap, Vintage, Navy/White, Undefined, *
-Fuji Bandana, Kapital, Navy/White, Undefined, *
+Beanie, Stussy/Nike, Black/None, Undefined
+Yankees Cap, Vintage, Navy/White, Undefined
+Fuji Bandana, Kapital, Navy/White, Undefined
 
 TOPS
 Logo Top, AFFXWRKS, LightBlue/Black, Slim, *
