@@ -24,7 +24,17 @@ source env/bin/activate
 pip3 install -r requirements.txt
 ```
 
-### 4) Troubleshooting
+### 4) Weather set up
+
+Currently, this [API](https://www.weatherapi.com/) is being used. Generate a .env file and add a weather key to use the feature.
+
+```shell
+WEATHER_KEY="YOUR API KEY"
+```
+
+The weather option is disabled by default, but can be turned on when creating the Database object.
+
+### 5) Troubleshooting
 
 If there are any problems dealing with installing certain packages - make sure your pip is updated to the most recent version.
 

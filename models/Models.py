@@ -1,6 +1,5 @@
 from __future__ import annotations
 import enum
-import copy
 import collections
 
 class Fit(enum.Enum):

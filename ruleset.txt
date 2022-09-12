@@ -41,6 +41,7 @@ Green -> Black = 1
 Green -> Brown = 1
 Brown -> Black = 1
 Brown -> Blue = 1
+Black -> Black = 1
 Tan -> Brown = 1
 Tan -> Blue = 1
 Tan -> White = 1

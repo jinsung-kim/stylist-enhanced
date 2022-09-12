@@ -2,8 +2,10 @@ from __future__ import annotations
 import sys
 import os
 import copy
-# import requests
-# from decouple import config
+import time
+import requests
+from decouple import config
+from threading import Thread
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from models.KeyValueStore import KeyValueStore
@@ -11,16 +13,23 @@ from models.Node import Node
 from models.Models import *
 
 CATEGORIES: list[str] = ["HATS", "OUTERWEAR", "TOPS", "BOTTOMS", "SHOES"]
+API_KEY: str = config("WEATHER_KEY")
 
 class Database:
     
-    def __init__(self) -> None:
+    def __init__(self, location: str = "Millbrae", weather_on: bool = False) -> None:
         # Each category organized
         self.items: dict[str, list[Node]] = {}
         self.ruleset: dict[str, KeyValueStore] = {}
         self.seen_outfits: list[list[ClothingItem]] = []
         self.nodes_start: list[Node] = []
-        self.curr = ""
+        self.curr: str = ""
+        self.location: str = location
+        self.temperature_f: float = 70
+        self.weather_on: bool = weather_on
+
+        if self.weather_on:
+            self._return_weather()
 
     def _generate_brand(self, text: str) -> Brand:
         split_brands: list[str] = text.split("/")
@@ -178,12 +187,18 @@ class Database:
 
     def generate_outfits(self, top_k: int) -> list[list[ClothingItem]]:
 
+        threads: list[Thread] = []
+
         for node in self.nodes_start:
-            self._dfs(node, [])
+            t = Thread(target=self._dfs, args=(node, [],))
+            threads.append(t)
+            t.start()
+
+        # Wait for all to finish
+        for t in threads:
+            t.join()
 
         scored: list[tuple[int, ClothingItem]] = []
-
-        print(self._outfit_count())
 
         # Evaluate scores
         for fit in self.seen_outfits:
@@ -232,7 +247,7 @@ class Database:
         # Has outerwear
         else:
             if self.ruleset["FIT"].exists(outfit[outerwear].size, outfit[bottom].size):
-                final_score += self.ruleset["FIT"].find(outfit[top].size, outfit[bottom].size)
+                final_score += self.ruleset["FIT"].find(outfit[outerwear].size, outfit[bottom].size)
             
             # Also check to ensure that the top does not outdo the top in terms of length / size
             if outfit[top].size.value > outfit[outerwear].size.value:
@@ -240,23 +255,55 @@ class Database:
             elif outfit[top].size == outfit[outerwear].size:
                 final_score += 1
 
-        # Go through color ruleset
-        for i in range(len(outfit) - 1):
-            if self.ruleset["COLOR"].exists(outfit[i].primary, outfit[i + 1].primary):
-                final_score += self.ruleset["COLOR"].find(outfit[i].primary, outfit[i + 1].primary)
+            # If the weather is lower than 65 degrees, outerwear is required (basically)
+            if self.temperature_f < 65.0 and self.weather_on:
+                final_score += 3
 
-        # TODO: Check weather
+        # Go through color ruleset, the main check is top -> bottom
+        if outerwear == -1:
+            if self.ruleset["COLOR"].exists(outfit[top].primary, outfit[bottom].primary):
+                final_score += self.ruleset["COLOR"].find(outfit[top].primary, outfit[bottom].primary)
+        else:
+            if self.ruleset["COLOR"].exists(outfit[outerwear].primary, outfit[bottom].primary):
+                final_score += self.ruleset["COLOR"].find(outfit[outerwear].primary, outfit[bottom].primary)
 
-        if (final_score < 0):
-            print(outfit)
-            print(final_score)
-            print()
+        # Pant to shoe combo -> all outfits will have this
+        if self.ruleset["COLOR"].exists(outfit[bottom].primary, outfit[-1].primary):
+            final_score += self.ruleset["COLOR"].find(outfit[bottom].primary, outfit[-1].primary)
 
         return final_score
+
+    def _return_weather(self):
+        WEATHER_URL: str = "http://api.weatherapi.com/v1/current.json?key=" + API_KEY + "&q=" + self.location + "&aqi=no"
+
+        r = requests.get(WEATHER_URL)
+
+        if (r.status_code == 200):
+            self.temperature_f = float(r.json()["current"]["temp_f"])
+            print("The weather in your area is " + str(self.temperature_f) +
+                  "° Fahrenheit")
+        else:
+            print(
+                "The weather could not be retrieved. Please try again later.")
+
+    def print_outfits(self, outfits: list[list[ClothingItem]]):
+        for outfit in outfits:
+            for item in outfit:
+                print(item)
+            print()
 
 if __name__ == "__main__":
     db: Database = Database()
 
+    time_start: float = time.time()
+
+    print("Generating")
+    print()
+
     db.load_clothing_from_txt()
     db.load_ruleset_from_txt()
-    db.generate_outfits(0)
+    db.print_outfits(db.generate_outfits(5))
+
+    time_end: float = time.time()
+
+    print("Generating outfits took {} seconds".format(time_end - time_start))
